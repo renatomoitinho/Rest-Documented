@@ -4,72 +4,61 @@
     <title>Getting Started: Serving Web Content</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/webjars/purecss/0.6.0/build/pure-min.css">
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css">
 
     <script src="/webjars/angularjs/1.4.7/angular.min.js"></script>
-    <script src="/webjars/angularjs/1.4.7/angular-resource.min.js"></script>
-    <script src="/webjars/angularjs/1.4.7/angular-route.min.js"></script>
+    <script src="/webjars/angularjs/1.4.7/angular-sanitize.min.js"></script>
     <script src="/webjars/jquery/2.1.4/jquery.min.js"></script>
+    <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
     <script th:inline="javascript">
+        var baseURI = [[${#httpServletRequest.getServerName()}]] + ":" + [[${#httpServletRequest.getServerPort()}]];
         var settings = [[${message}]];
-        angular.module('myApp',[]).controller('GreetingController', ['$scope', function($scope) {
-              $scope.greeting = eval("("+new String(settings)+")");
+        angular.module('myApp',['ngSanitize']).controller('GreetingController', ['$scope', function($scope) {
+            $scope.baseURI = baseURI;
+            $scope.greeting = eval("("+new String(settings)+")");
+
+            $scope.formatJSON = function(str){
+                console.log(typeof str);
+                return JSON.stringify(JSON.parse(str), undefined, 2);
+            }
         }]);
     </script>
 
-    <style type="text/css">
-        .navigation{width:100%;height:100%;position:fixed;top:0;right:0;bottom:0;left:0;z-index:0;list-style:none;background:#111}.nav-item{width:200px;border-top:1px solid #111;border-bottom:1px solid #000}.nav-item a{display:block;padding:1em;background:linear-gradient(135deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%);color:#fff;font-size:1.2em;text-decoration:none;transition:color 0.2s,background .5s}.nav-item a:hover{color:#c74438;background:linear-gradient(135deg,rgba(0,0,0,0) 0%,rgba(75,20,20,0.65) 100%)}.site-wrap{min-height:100%;min-width:100%;background-color:#fff;position:relative;top:0;bottom:100%;left:0;z-index:1;padding:4em;background-image:linear-gradient(135deg,#feffff 0%,#ddf1f9 35%,#a0d8ef 100%);background-size:200%}.nav-trigger{position:absolute;clip:rect(0,0,0,0)}label[for="nav-trigger"]{position:fixed;left:15px;top:15px;z-index:2;height:30px;width:30px;cursor:pointer;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' x='0px' y='0px' width='30px' height='30px' viewBox='0 0 30 30' enable-background='new 0 0 30 30' xml:space='preserve'><rect width='30' height='6'/><rect y='24' width='30' height='6'/><rect y='12' width='30' height='6'/></svg>");background-size:contain}.nav-trigger + label,.site-wrap{transition:left .2s}.nav-trigger:checked + label{left:215px}.nav-trigger:checked ~ .site-wrap{left:200px;box-shadow:0 0 5px 5px rgba(0,0,0,0.5)}body{overflow-x:hidden}h1,h3,p{max-width:600px;margin:0 auto 1em}code{padding:2px;background:#ddd}*,:before,:after{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;margin:0;padding:0}html,body{height:100%;width:100%;font-family:Helvetica,Arial,sans-serif}
-
-        .item-unread {
-            border-left: 5px solid #1b98f8;
-            padding-left: 10px;
-            margin: 5px;
-        }
-    </style>
-
 </head>
 <body ng-app="myApp">
-    <div ng-controller="GreetingController">
-        <ul class="navigation">
-            <li class="nav-item"><a href="#">Home</a></li>
-            <li class="nav-item"><a href="#">Portfolio</a></li>
-            <li class="nav-item"><a href="#">About</a></li>
-            <li class="nav-item"><a href="#">Blog</a></li>
-            <li class="nav-item"><a href="#">Contact</a></li>
-        </ul>
+    <div class="container-fluid" ng-controller="GreetingController">
 
-        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
-        <label for="nav-trigger"></label>
+        <h1>{{greeting.title}}</h1>
+        <h2>{{greeting.info}}</h2>
 
-        <div class="site-wrap">
+        <div class="row" ng-repeat="mapping in greeting.mappings">
+            <h3>{{mapping.title}}</h3>
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 
-            <h1>{{greeting.title}}</h1>
-            <h3>{{greeting.info}}</h3>
-
-            <div>
-                <h4>
-                    natus.Perferendis quis ea incidunt ducimus nisi voluptate natus. Repellat asperiores quod rerum rem quos blanditiis enim modi, veniam voluptas a facilis! Velit cum omnis, voluptatum eum inventore! Corrupti, suscipit, neque distinctio expedita est laboriosam cum aliquid minus tempora quaerat officia possimus unde vel deleniti eaque fugit accusamus iusto dolorum natus.
-                </h4>
-
-                <div class="item-unread">
-                    natus. Repellat asperiores quod rerum rem quos blanditiis enim modi, veniam voluptas a facilis! Velit cum omnis, voluptatum eum inventore! Corrupti, suscipit, neque distinctio expedita est laboriosam cum aliquid minus tempora quaerat officia possimus unde vel deleniti eaque fugit accusamus iusto dolorum natus.
+                <div class="panel panel-default" ng-repeat="route in mapping.routes">
+                    <div class="panel-heading" role="tab" id="route-{{$index}}">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-route{{$index}}" aria-expanded="true" aria-controls="collapse-route{{$index}}">
+                                {{route.title}}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapse-route{{$index}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="route-{{$index}}">
+                        <div class="panel-body">
+                            <h5><span class="label label-success">{{route.method}}</span>{{baseURI}} {{route.url}}</h5>
+                            <div ng-repeat="resp in route.response">
+                                <span>{{resp.status}}/{{resp.contentType}}</span>
+                                <pre ng-bind-html="formatJSON(resp.content)"> </pre>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="item-unread">
-                    natus. Repellat asperiores quod rerum rem quos blanditiis enim modi, veniam voluptas a facilis! Velit cum omnis, voluptatum eum inventore! Corrupti, suscipit, neque distinctio expedita est laboriosam cum aliquid minus tempora quaerat officia possimus unde vel deleniti eaque fugit accusamus iusto dolorum natus.
-                </div>
-
-                <div class="item-unread">
-                    natus. Repellat asperiores quod rerum rem quos blanditiis enim modi, veniam voluptas a facilis! Velit cum omnis, voluptatum eum inventore! Corrupti, suscipit, neque distinctio expedita est laboriosam cum aliquid minus tempora quaerat officia possimus unde vel deleniti eaque fugit accusamus iusto dolorum natus.
-                </div>
-
-                <div class="item-unread">
-                    natus. Repellat asperiores quod rerum rem quos blanditiis enim modi, veniam voluptas a facilis! Velit cum omnis, voluptatum eum inventore! Corrupti, suscipit, neque distinctio expedita est laboriosam cum aliquid minus tempora quaerat officia possimus unde vel deleniti eaque fugit accusamus iusto dolorum natus.
-                </div>
             </div>
-
         </div>
+
     </div>
 </body>
 </html>
