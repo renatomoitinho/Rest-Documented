@@ -19,7 +19,7 @@
             $scope.baseURI = baseURI;
             $scope.greeting = eval("("+new String(settings)+")");
 
-            $scope.formatJSON = function(str){
+            $scope.formatJSON = function(str) {
                 console.log(typeof str);
                 return JSON.stringify(JSON.parse(str), undefined, 2);
             }
