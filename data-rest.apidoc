@@ -7,7 +7,11 @@
                 {
                     title: "List All Question",
                     method: "GET",
-                    url: "/questions",
+                    url: "#baseURI/questions",
+                    request:{
+                        curl:'curl --include \ "#baseURI/questions"',
+                        headers:[]
+                    },
                     response: [{
                         contentType:"application/json",
                         status: 200,
@@ -18,7 +22,29 @@
 
                     title: "Create a new Question",
                     method: "POST",
-                    url: "/questions",
+                    url: "#baseURI/questions",
+                    response: [{
+                        status: 200
+                    },{
+                        status: 401,
+                        content: '{"error":"unauthorized"}'
+                    }]
+                },
+                 {
+                    title: "Update a Question",
+                    method: "PUT",
+                    url: "#baseURI/questions",
+                    response: [{
+                        status: 200
+                    },{
+                        status: 401,
+                        content: '{"error":"unauthorized"}'
+                    }]
+                },
+                 {
+                    title: "Remove a Question",
+                    method: "DELETE",
+                    url: "#baseURI/questions/{question}",
                     response: [{
                         status: 200
                     },{

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Getting Started: Serving Web Content</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css">
@@ -11,54 +11,159 @@
     <script src="/webjars/angularjs/1.4.7/angular-sanitize.min.js"></script>
     <script src="/webjars/jquery/2.1.4/jquery.min.js"></script>
     <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="/webjars/bootstrap/3.3.5/js/tooltip.js"></script>
+    <script src="/webjars/bootstrap/3.3.5/js/popover.js"></script>
+
 
     <script th:inline="javascript">
         var baseURI = [[${#httpServletRequest.getServerName()}]] + ":" + [[${#httpServletRequest.getServerPort()}]];
         var settings = [[${message}]];
-        angular.module('myApp',['ngSanitize']).controller('GreetingController', ['$scope', function($scope) {
-            $scope.baseURI = baseURI;
-            $scope.greeting = eval("("+new String(settings)+")");
+        angular.module('myApp', ['ngSanitize']).controller('GreetingController', ['$scope', function ($scope) {
+            $scope.methods = {
+                "GET": "success",
+                "POST": "primary",
+                "PUT": "warning",
+                "DELETE": "danger"
+            };
 
-            $scope.formatJSON = function(str) {
-                console.log(typeof str);
+            $scope.baseURI = baseURI;
+            $scope.greeting = eval("(" + new String(settings) + ")");
+
+            $scope.formatJSON = function (str) {
                 return JSON.stringify(JSON.parse(str), undefined, 2);
-            }
+            };
+
+            $scope.replaceURL = function (url) {
+                return url.replace("#baseURI", baseURI);
+            };
         }]);
+
+        $(function () {
+            $('[data-toggle="popover"]').popover();
+        });
     </script>
+    <style type="text/css">
+
+        .custom-panel-body {
+        }
+
+        .custom-panel-body pre {
+            background: none;
+            border: none;
+        }
+
+        .custom-label {
+            margin: 0 10px 0 0;
+        }
+
+        .panel {
+            border: none !important;
+        }
+
+        .bs-callout-success {
+            border-left-color: #5cb85c !important;
+        }
+
+        .bs-callout-primary {
+            border-left-color: #337ab7 !important;
+        }
+
+        .bs-callout-warning {
+            border-left-color: #f0ad4e !important;
+        }
+
+        .bs-callout-danger {
+            border-left-color: #d9534f !important;
+        }
+
+        .bs-callout-title {
+            border-left-color: #615FAD !important;
+        }
+
+        .bs-callout {
+            padding: 5px;
+            border-left: 3px solid #eee;
+        }
+    </style>
+
 
 </head>
 <body ng-app="myApp">
-    <div class="container-fluid" ng-controller="GreetingController">
+<div class="container-fluid" ng-controller="GreetingController">
 
-        <h1>{{greeting.title}}</h1>
-        <h2>{{greeting.info}}</h2>
+    <h1>{{greeting.title}}</h1>
 
-        <div class="row" ng-repeat="mapping in greeting.mappings">
+    <h2>{{greeting.info}}</h2>
+
+    <div class="row" ng-repeat="mapping in greeting.mappings">
+        <div class="col-md-12 bs-callout bs-callout-title">
             <h3>{{mapping.title}}</h3>
-            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 
-                <div class="panel panel-default" ng-repeat="route in mapping.routes">
-                    <div class="panel-heading" role="tab" id="route-{{$index}}">
-                        <h4 class="panel-title">
-                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-route{{$index}}" aria-expanded="true" aria-controls="collapse-route{{$index}}">
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel" ng-repeat="route in mapping.routes">
+                    <div class="bs-callout bs-callout-{{methods[route.method]}}" role="tab" id="route-{{$index}}">
+                        <h4>
+                            <a role="button" data-toggle="collapse" data-parent="#accordion"
+                               href="#collapse-route{{$index}}" aria-expanded="true"
+                               aria-controls="collapse-route{{$index}}">
                                 {{route.title}}
                             </a>
                         </h4>
                     </div>
-                    <div id="collapse-route{{$index}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="route-{{$index}}">
-                        <div class="panel-body">
-                            <h5><span class="label label-success">{{route.method}}</span>{{baseURI}} {{route.url}}</h5>
-                            <div ng-repeat="resp in route.response">
-                                <span>{{resp.status}}/{{resp.contentType}}</span>
-                                <pre ng-bind-html="formatJSON(resp.content)"> </pre>
+                    <div id="collapse-route{{$index}}" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="route-{{$index}}">
+                        <div class="panel-body custom-panel-body">
+                            <h5>
+                                <button type="button" class="btn btn-default btn-xs" data-toggle="popover" title="Popover title"
+                                        data-content="And here's some amazing content. It's very engaging. Right?">
+                                    <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+                                </button>
+
+                                <span class="label custom-label label-{{methods[route.method]}}">{{route.method}}</span>
+                                {{replaceURL(route.url)}}
+                            </h5>
+                            <hr/>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#tab-req-{{$index}}"
+                                                                          aria-controls="tab-req-{{$index}}" role="tab"
+                                                                          data-toggle="tab">Request</a></li>
+                                <li role="presentation"><a href="#tab-resp-{{$index}}"
+                                                           aria-controls="tab-resp-{{$index}}" role="tab"
+                                                           data-toggle="tab">Response</a></li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="tab-req-{{$index}}">
+                                    <div ng-if="route.request">
+                                        <table class="table table-striped" ng-if="route.request.length">
+                                            <thead>
+                                            <tr>
+                                                <th>First Name</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="header in route.request.headers">
+                                                <td>{{header}}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <code ng-bind-html="replaceURL(route.request.curl)"></code>
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="tab-resp-{{$index}}">
+                                    <div ng-repeat="resp in route.response">
+                                        <h6>{{resp.status}}</h6>
+                                        <code>Content-Type: {{resp.contentType}};</code>
+                                        <pre ng-if="resp.content" ng-bind-html="formatJSON(resp.content)"> </pre>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
-
     </div>
+</div>
 </body>
 </html>
